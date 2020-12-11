@@ -54,6 +54,8 @@ from . import utils
 from .flags import Intents, MemberCacheFlags
 from .object import Object
 from .invite import Invite
+from .slash import Interaction
+
 
 class ChunkRequest:
     def __init__(self, guild_id, loop, resolver, *, cache=True):
@@ -483,7 +485,7 @@ class ConnectionState:
         self._ready_task = asyncio.ensure_future(self._delay_ready(), loop=self.loop)
 
     def parse_interaction_create(self, data):
-        self.dispatch("slash_command", data)
+        self.dispatch("slash_command", Interaction(state=self, data=data))
 
     def parse_resumed(self, data):
         self.dispatch('resumed')

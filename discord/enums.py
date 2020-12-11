@@ -53,6 +53,8 @@ __all__ = (
     'ExpireBehaviour',
     'ExpireBehavior',
     'StickerType',
+    'InteractionResponseType',
+    'InteractionType'
 )
 
 def _create_value_cls(name):
@@ -450,6 +452,17 @@ class StickerType(Enum):
     png = 1
     apng = 2
     lottie = 3
+
+class InteractionType(Enum):
+    ping = 1
+    application_command = 2
+
+class InteractionResponseType(Enum):
+    pong = 1
+    acknowledge = 2
+    channel_message = 3
+    channel_message_with_source = 4
+    ACK_with_source = 5
 
 def try_enum(cls, val):
     """A function that tries to turn the value into enum ``cls``.
