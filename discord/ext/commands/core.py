@@ -128,6 +128,16 @@ class _CaseInsensitiveDict(dict):
     def __setitem__(self, k, v):
         super().__setitem__(k.casefold(), v)
 
+param_types = {
+    str: discord.ApplicationCommandOptionType.string,
+    int: discord.ApplicationCommandOptionType.integer,
+    bool: discord.ApplicationCommandOptionType.boolean,
+    discord.User: discord.ApplicationCommandOptionType.user,
+    discord.TextChannel: discord.ApplicationCommandOptionType.channel,
+    discord.VoiceChannel: discord.ApplicationCommandOptionType.channel,
+    discord.Role: discord.ApplicationCommandOptionType.role
+}
+
 class Command(_BaseCommand):
     r"""A class that implements the protocol for a bot text command.
 
@@ -1076,6 +1086,15 @@ class Command(_BaseCommand):
             return await discord.utils.async_all(predicate(ctx) for predicate in predicates)
         finally:
             ctx.command = original
+
+    def to_slash_command(self):
+        options = []
+        for name, param in self.clean_params.items():
+            type = param_types.get(param.annotation, discord.ApplicationCommandOptionType.string)
+            required = False if param.default is not inspect.Parameter.empty else True
+            options.append({'name': name, 'type': type.value, 'required': required, 'description': 'TODO'}) 
+
+        return {'name': self.name, 'description': self.help, 'options': options}
 
 class GroupMixin:
     """A mixin that implements common functionality for classes that behave

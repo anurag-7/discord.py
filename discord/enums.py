@@ -54,7 +54,8 @@ __all__ = (
     'ExpireBehavior',
     'StickerType',
     'InteractionResponseType',
-    'InteractionType'
+    'InteractionType',
+    'ApplicationCommandOptionType'
 )
 
 def _create_value_cls(name):
@@ -463,6 +464,16 @@ class InteractionResponseType(Enum):
     channel_message = 3
     channel_message_with_source = 4
     ACK_with_source = 5
+
+class ApplicationCommandOptionType(Enum):
+    subcommand = 1
+    subcommand_group = 2
+    string = 3
+    integer = 4
+    boolean = 5
+    user = 6
+    channel = 7
+    role = 8
 
 def try_enum(cls, val):
     """A function that tries to turn the value into enum ``cls``.

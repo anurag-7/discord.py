@@ -1,7 +1,10 @@
+from collections import namedtuple
+
 from .enums import try_enum, InteractionType, InteractionType
 from .member import Member
 from .http import Route
 
+option = namedtuple('Option', 'name value')
 
 class Interaction:
     def __init__(self, *, state, data):
@@ -12,7 +15,7 @@ class Interaction:
         self.channel, self.guild = state._get_guild_channel(data)
         self.member = Member(data=data['member'], guild=self.guild, state=state)
         self.token = data['token']
-        self.options = data['data']['options']
+        self.options = [option(name, value) for name, value in data['data']['options'].items()]
         self.name = data['data']['name']
 
     async def send(self, content=None, *, type, tts=False, embed=None, embeds=None, allowed_mentions=None):

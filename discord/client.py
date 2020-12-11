@@ -1490,3 +1490,8 @@ class Client:
         """
         data = await self.http.get_webhook(webhook_id)
         return Webhook.from_state(data, state=self._connection)
+
+    async def create_slash_command(self, slash_command):
+        data = slash_command.to_dict()
+
+
