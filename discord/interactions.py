@@ -8,17 +8,22 @@ ResponseOption = namedtuple('Option', 'name value')
 ApplicationCommandOptionChoice = namedtuple('ApplicationCommandOptionChoice', 'name value')
 
 class ApplicationCommand:
-    def __init__(self, *, state, data):
+    def __init__(self, *, state, data, guild_id=None):
         self._state = state
+        self.guild_id = guild_id
         self.id = int(data['id'])
         self.application_id = int(data['application_id'])
         self.name = data['name']
         self.description = data['description']
+
         self.options = [ApplicationCommandOption(**option) for option in data['options']]
 
     async def delete(self):
-        await self._state.delete_application_command(self.application_id, self.id)
-
+        if not guild:
+            return await self._state.delete_application_command(self.application_id, self.id)
+        
+        await self._state.delete_guild_application_command(self.application_id, self.id, self.guild.id)
+    
     async def edit(self, guild=None, **kwargs):
         pass
 
@@ -123,7 +128,7 @@ class Interaction:
         if flags:
             payload['flags'] = flags
 
-        await self._state.http.request(Route('POST', '/interactions/{id}/{token}/callback', id=self.id, token=self.token), json={'data': payload, 'type': type.value})
+        await self._state.http.interaction_callback(self.id, self.token, {'data': payload, 'type': type.value})
 
     async def edit_original(self, **kwargs):  # see below
         pass

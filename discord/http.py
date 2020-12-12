@@ -953,3 +953,6 @@ class HTTPClient:
 
     def edit_settings(self, **payload):
         return self.request(Route('PATCH', '/users/@me/settings'), json=payload)
+
+    def interaction_callback(self, id, token, payload):
+        return self.request(Route("POST", "/interactions/{id}/{token}/callback", id=id, token=token), json=payload)
