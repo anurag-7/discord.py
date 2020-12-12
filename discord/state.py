@@ -54,7 +54,7 @@ from . import utils
 from .flags import Intents, MemberCacheFlags
 from .object import Object
 from .invite import Invite
-from .slash import Interaction
+from .interactions import Interaction
 
 
 class ChunkRequest:

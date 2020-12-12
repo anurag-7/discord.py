@@ -4,7 +4,45 @@ from .enums import try_enum, InteractionType, InteractionType
 from .member import Member
 from .http import Route
 
-option = namedtuple('Option', 'name value')
+ResponseOption = namedtuple('Option', 'name value')
+ApplicationCommandOptionChoice = namedtuple('ApplicationCommandOptionChoice', 'name value')
+
+class ApplicationCommand:
+    def __init__(self, *, state, data):
+        self._state = state
+        self.id = int(data['id'])
+        self.application_id = int(data['application_id'])
+        self.name = data['name']
+        self.description = data['description']
+        self.options = [ApplicationCommandOption(**option) for option in data['options']]
+
+    async def delete(self):
+        await self._state.delete_application_command(self.application_id, self.id)
+
+    async def edit(self, guild=None, **kwargs):
+        pass
+
+class ApplicationCommandOption(namedtuple('ApplicationCommandOption', 'name description type default required choices options')):
+    def add_option(self, *, name, description, type, default=None, required=None, choices=None):
+        option = {'name': name, 'description': description, 'type': type}
+        if default is not None:
+            option['default'] = default
+        if required is not None:
+            option['required'] = required
+        if choices is None:
+            choices = []
+
+        option['choices'] = [self.__class__(**choice) for choice in choices]  
+        option = self.__class__(**option)
+        self.options.append(option)
+        return option
+
+    def to_dict(self):
+        data = self._asdict()
+        data['type'] = data['type'].value
+        data['options'] = [option.to_dict() for option in data['options']]
+        data['choices'] = [choice._as_dict() for choice in data['choices']]
+        return data
 
 class Interaction:
     def __init__(self, *, state, data):
@@ -15,10 +53,11 @@ class Interaction:
         self.channel, self.guild = state._get_guild_channel(data)
         self.member = Member(data=data['member'], guild=self.guild, state=state)
         self.token = data['token']
-        self.options = [option(name, value) for name, value in data['data']['options'].items()]
+        self.options = [ResponseOption(option['name'], option['value']) for option in data['data'].get('options', [])]
         self.name = data['data']['name']
+        self.version = data['version']
 
-    async def send(self, content=None, *, type, tts=False, embed=None, embeds=None, allowed_mentions=None):
+    async def send(self, content=None, *, type, tts=False, embed=None, embeds=None, allowed_mentions=None, flags=0):
         """
         Sends a message using the webhook.
         The content must be a type that can convert to a string through ``str(content)``.
@@ -81,4 +120,23 @@ class Interaction:
         elif previous_mentions is not None:
             payload['allowed_mentions'] = previous_mentions.to_dict()
         
+        if flags:
+            payload['flags'] = flags
+
         await self._state.http.request(Route('POST', '/interactions/{id}/{token}/callback', id=self.id, token=self.token), json={'data': payload, 'type': type.value})
+
+    async def edit_original(self, **kwargs):  # see below
+        pass
+
+    async def delete_original(self):  # might return Message and use message.delete
+        pass
+
+    async def send_followup(self, **kwargs):
+        pass
+
+    async def delete_followup(self):  # might return Message and use message.delete 
+        pass
+
+    async def edit_followup(self):  # see above
+        pass
+
