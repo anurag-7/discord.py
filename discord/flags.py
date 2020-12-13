@@ -242,6 +242,10 @@ class MessageFlags(BaseFlags):
         """
         return 16
 
+    @flag_value
+    def hidden(self):
+        return 64
+
 @fill_with_flags()
 class PublicUserFlags(BaseFlags):
     r"""Wraps up the Discord User Public flags.

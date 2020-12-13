@@ -1390,6 +1390,20 @@ class Group(GroupMixin, Command):
             view.previous = previous
             await super().reinvoke(ctx, call_hooks=call_hooks)
 
+    def to_slash_command(self):
+        data = super().to_slash_command()
+        for command in commands:
+            sub_data = command.to_slash_command()
+            if isinstance(command, GroupMixin):
+                type = discord.ApplicationCommandOption.sub_command_group
+            else:
+                type = discord.ApplicationCommandOption.sub_command
+
+            sub_data['type'] = type.value
+            data['options'].append(sub_data)
+        
+        return data
+
 # Decorators
 
 def command(name=None, cls=None, **attrs):

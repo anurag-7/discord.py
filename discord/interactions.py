@@ -128,20 +128,19 @@ class Interaction:
         if flags:
             payload['flags'] = flags
 
-        await self._state.http.interaction_callback(self.id, self.token, {'data': payload, 'type': type.value})
+        message = await self._state.http.interaction_callback(self.id, self.token, {'data': payload, 'type': type.value})
 
-    async def edit_original(self, **kwargs):  # see below
+    async def edit_original(self, **kwargs):
         pass
 
-    async def delete_original(self):  # might return Message and use message.delete
+    async def delete_original(self):
         pass
 
     async def send_followup(self, **kwargs):
         pass
 
-    async def delete_followup(self):  # might return Message and use message.delete 
+    async def delete_followup(self):
         pass
 
-    async def edit_followup(self):  # see above
+    async def edit_followup(self, **kwargs):
         pass
-
