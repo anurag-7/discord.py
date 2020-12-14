@@ -958,7 +958,11 @@ class HTTPClient:
     # slash commands
 
     def interaction_callback(self, id, token, payload):
-        return self.request(Route("POST", "/interactions/{id}/{token}/callback?wait=true", id=id, token=token), json=payload)
+        return self.request(Route("POST", "/interactions/{id}/{token}/callback", id=id, token=token), json=payload)
+
+    async def send_followup_message(self, token, payload):
+        id = await self.get_application_id()
+        return self.request(Route("POST", "/webhooks/{id}/{token}", id=id, token=token), json=payload)
 
     async def get_application_commands(self):
         id = await self.get_application_id()
@@ -991,7 +995,7 @@ class HTTPClient:
     async def get_application_id(self):
         if not self.application_id:
             appinfo = await self.application_info()
-            id, self.application_id = int(appinfo['id'])
-            return id
+            self.application_id = int(appinfo['id'])
+            return self.application_id
         return self.application_id
 
