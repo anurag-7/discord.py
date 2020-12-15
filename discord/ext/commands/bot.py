@@ -941,6 +941,9 @@ class BotBase(GroupMixin):
     async def on_message(self, message):
         await self.process_commands(message)
 
+    async def on_slash_command(self, inter):
+        await self.process_slash_command(inter)
+
 class Bot(BotBase, discord.Client):
     """Represents a discord bot.
 

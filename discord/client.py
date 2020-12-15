@@ -53,6 +53,7 @@ from .backoff import ExponentialBackoff
 from .webhook import Webhook
 from .iterators import GuildIterator
 from .appinfo import AppInfo
+from .interactions import ApplicationCommand
 
 log = logging.getLogger(__name__)
 
@@ -1493,7 +1494,9 @@ class Client:
         return Webhook.from_state(data, state=self._connection)
 
     async def create_slash_command(self, slash_command):
-        
-        data = slash_command.to_dict()
+        data = await self.http.create_application_command(slash_command)
+        return ApplicationCommand(state=self._connection, data=data)
 
-
+    async def commands(self):
+        data = await self.http.get_application_commands()
+        return [ApplicationCommand(state=self._state, data=data) for data in data]

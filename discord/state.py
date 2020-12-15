@@ -485,7 +485,7 @@ class ConnectionState:
         self._ready_task = asyncio.ensure_future(self._delay_ready(), loop=self.loop)
 
     def parse_interaction_create(self, data):
-        self.dispatch("slash_command", Interaction(state=self, data=data))
+        self.dispatch("interaction", Interaction(state=self, data=data))
 
     def parse_resumed(self, data):
         self.dispatch('resumed')

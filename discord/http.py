@@ -962,7 +962,11 @@ class HTTPClient:
 
     async def send_followup_message(self, token, payload):
         id = await self.get_application_id()
-        return self.request(Route("POST", "/webhooks/{id}/{token}", id=id, token=token), json=payload)
+        return await self.request(Route("POST", "/webhooks/{id}/{token}", id=id, token=token), json=payload)
+
+    async def get_guild_application_commands(self, guild_id):
+        id = await self.get_application_id()
+        return await self.request(Route("GET", "/applications/{id}/guilds/{guild_id}/commands", id=id, guild_id=guild_id))
 
     async def get_application_commands(self):
         id = await self.get_application_id()

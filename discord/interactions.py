@@ -9,9 +9,9 @@ ResponseOption = namedtuple('Option', 'name value')
 ApplicationCommandOptionChoice = namedtuple('ApplicationCommandOptionChoice', 'name value')
 
 class ApplicationCommand:
-    def __init__(self, *, state, data, guild_id=None):
+    def __init__(self, *, state, data, guild=None):
         self._state = state
-        self.guild_id = guild_id
+        self.guild = guild
         self.id = int(data['id'])
         self.application_id = int(data['application_id'])
         self.name = data['name']
@@ -20,13 +20,24 @@ class ApplicationCommand:
         self.options = [ApplicationCommandOption(**option) for option in data['options']]
 
     async def delete(self):
-        if not guild:
-            return await self._state.delete_application_command(self.application_id, self.id)
-        
-        await self._state.delete_guild_application_command(self.application_id, self.id, self.guild.id)
-    
+        if not self.guild:
+            await self._state.delete_application_command(self.application_id, self.id)
+        else:
+            self._state.delete_guild_application_command(self.application_id, self.id, self.guild.id)
+
     async def edit(self, guild=None, **kwargs):
-        pass
+        kwargs.setdefault("name", self.name)
+        kwargs.setdefault("description", self.description)
+        kwargs.setdefault("options", self.options)
+
+        kwargs["options"] = [option.to_dict() for option in kwargs["options"]]
+
+        if not self.guild:
+            new_data = await self._state.edit_application_command(self.application_id, kwargs)
+        else:
+            new_data = await self._state.edit_guild_application_command(self.guild.id, self.application_id, kwargs)
+
+        self.__init__(state=self_state, data=new_data, guild=self.guild)
 
 class ApplicationCommandOption(namedtuple('ApplicationCommandOption', 'name description type default required choices options')):
     def add_option(self, *, name, description, type, default=None, required=None, choices=None):
@@ -52,7 +63,6 @@ class ApplicationCommandOption(namedtuple('ApplicationCommandOption', 'name desc
 
 class Interaction:
     def __init__(self, *, state, data):
-        print(data)
         self._state = state
         self.id = int(data['id'])
         self.type = try_enum(InteractionType, data['type'])
