@@ -59,7 +59,7 @@ from .audit_logs import AuditLogChanges, AuditLogEntry, AuditLogDiff
 from .raw_models import *
 from .team import *
 from .sticker import Sticker
-from .interactions import Interaction, ResponseOption, ApplicationCommandOptionChoice, ApplicationCommand, ApplicationCommandOption
+from .interactions import Interaction, ApplicationCommandInteractionDataOption, ApplicationCommandOptionChoice, ApplicationCommand, ApplicationCommandOption
 
 VersionInfo = namedtuple('VersionInfo', 'major minor micro releaselevel serial')
 

@@ -1392,12 +1392,12 @@ class Group(GroupMixin, Command):
 
     def to_slash_command(self):
         data = super().to_slash_command()
-        for command in commands:
+        for command in self.commands:
             sub_data = command.to_slash_command()
             if isinstance(command, GroupMixin):
-                type = discord.ApplicationCommandOption.sub_command_group
+                type = discord.ApplicationCommandOptionType.subcommand_group
             else:
-                type = discord.ApplicationCommandOption.sub_command
+                type = discord.ApplicationCommandOptionType.subcommand
 
             sub_data['type'] = type.value
             data['options'].append(sub_data)

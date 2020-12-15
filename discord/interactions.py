@@ -1,15 +1,24 @@
 from collections import namedtuple
 
-from .enums import try_enum, InteractionType, InteractionType
+from .enums import try_enum, InteractionType, ApplicationCommandOptionType
 from .member import Member
 from .message import Message
 from .errors import InvalidArgument
 
-ResponseOption = namedtuple('Option', 'name value')
 ApplicationCommandOptionChoice = namedtuple('ApplicationCommandOptionChoice', 'name value')
+
+class ApplicationCommandInteractionDataOption:
+    def __init__(self, *, name, value=None, options=None):
+        self.name = name
+        self.value = value
+        self.options = [self.__class__(**option) for option in (options or [])]
+
+    def to_dict(self):
+        return {'name': self.name, 'value': self.value, 'options': [option.to_dict() for option in self.options]}
 
 class ApplicationCommand:
     def __init__(self, *, state, data, guild=None):
+        print(data)
         self._state = state
         self.guild = guild
         self.id = int(data['id'])
@@ -17,7 +26,7 @@ class ApplicationCommand:
         self.name = data['name']
         self.description = data['description']
 
-        self.options = [ApplicationCommandOption(**option) for option in data['options']]
+        self.options = [ApplicationCommandOption(**option) for option in data.get('options', [])]
 
     async def delete(self):
         if not self.guild:
@@ -39,7 +48,16 @@ class ApplicationCommand:
 
         self.__init__(state=self_state, data=new_data, guild=self.guild)
 
-class ApplicationCommandOption(namedtuple('ApplicationCommandOption', 'name description type default required choices options')):
+class ApplicationCommandOption:
+    def __init__(self, *, name, description, type, default=False, required=False, choices=None, options=None):
+        self.name = name
+        self.description = description
+        self.type = try_enum(ApplicationCommandOptionType, type)
+        self.default = default
+        self.required = required
+        self.choices = [ApplicationCommandOptionChoice(**choice) for choice in (choices or [])]
+        self.options = [self.__class__(**option) for option in (options or [])]
+
     def add_option(self, *, name, description, type, default=None, required=None, choices=None):
         option = {'name': name, 'description': description, 'type': type}
         if default is not None:
@@ -49,27 +67,28 @@ class ApplicationCommandOption(namedtuple('ApplicationCommandOption', 'name desc
         if choices is None:
             choices = []
 
-        option['choices'] = [self.__class__(**choice) for choice in choices]  
+        option['choices'] = [ApplicationCommandOptionChoice(**choice) for choice in choices]  
         option = self.__class__(**option)
         self.options.append(option)
         return option
 
     def to_dict(self):
-        data = self._asdict()
-        data['type'] = data['type'].value
-        data['options'] = [option.to_dict() for option in data['options']]
-        data['choices'] = [choice._as_dict() for choice in data['choices']]
+        data =  {'name': self.name, 'description': self.description, 'default': self.default, 'required': self.required}
+        data['type'] = self.type.value
+        data['options'] = [option.to_dict() for option in self.options]
+        data['choices'] = [choice._as_dict() for choice in self.choices]
         return data
 
 class Interaction:
     def __init__(self, *, state, data):
+        print(data)
         self._state = state
         self.id = int(data['id'])
         self.type = try_enum(InteractionType, data['type'])
         self.channel, self.guild = state._get_guild_channel(data)
         self.member = Member(data=data['member'], guild=self.guild, state=state)
         self.token = data['token']
-        self.options = [ResponseOption(option['name'], option['value']) for option in data['data'].get('options', [])]
+        self.options = [ApplicationCommandInteractionDataOption(**option) for option in data['data'].get('options', [])]
         self.name = data['data']['name']
         self.version = data['version']
 
@@ -142,8 +161,37 @@ class Interaction:
         await self._state.http.interaction_callback(self.id, self.token, {'data': payload, 'type': type.value})
 
     async def edit_original(self, **kwargs):
-        pass
+        try:
+            content = fields['content']
+        except KeyError:
+            pass
+        else:
+            if content is not None:
+                fields['content'] = str(content)
 
+        try:
+            embed = fields['embed']
+        except KeyError:
+            pass
+        else:
+            if embed is not None:
+                fields['embed'] = embed.to_dict()
+
+        try:
+            allowed_mentions = fields.pop('allowed_mentions')
+        except KeyError:
+            pass
+        else:
+            if allowed_mentions is not None:
+                if self._state.allowed_mentions is not None:
+                    allowed_mentions = self._state.allowed_mentions.merge(allowed_mentions).to_dict()
+                else:
+                    allowed_mentions = allowed_mentions.to_dict()
+                fields['allowed_mentions'] = allowed_mentions
+
+        if fields:
+            await self._state.http.edit_interaction_message(self.id,self.token, fields)
+    
     async def delete_original(self):
         await self._state.http.delete_interaction_callback(self.id, self.token)
 
