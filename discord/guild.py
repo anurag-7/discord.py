@@ -44,7 +44,7 @@ from .iterators import AuditLogIterator, MemberIterator
 from .widget import Widget
 from .asset import Asset
 from .flags import SystemChannelFlags
-from .integrations import Integration
+from .integrations import Integration, ApplicationCommand
 
 
 BanEntry = namedtuple('BanEntry', 'reason user')

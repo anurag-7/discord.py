@@ -2,8 +2,8 @@ from collections import namedtuple
 
 from .enums import try_enum, InteractionType, InteractionType
 from .member import Member
-from .http import Route
 from .message import Message
+from .errors import InvalidArgument
 
 ResponseOption = namedtuple('Option', 'name value')
 ApplicationCommandOptionChoice = namedtuple('ApplicationCommandOptionChoice', 'name value')

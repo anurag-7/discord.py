@@ -252,7 +252,6 @@ class Client:
         self._ready = asyncio.Event()
         self._connection._get_websocket = self._get_websocket
         self._connection._get_client = lambda: self
-        self.application_id = None
 
         if VoiceClient.warn_nacl:
             VoiceClient.warn_nacl = False
