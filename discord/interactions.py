@@ -145,7 +145,7 @@ class Interaction:
         pass
 
     async def delete_original(self):
-        pass
+        await self._state.http.delete_interaction_callback(self.id, self.token)
 
     async def send_followup(self, content=None, *, tts=False, embed=None, embeds=None, allowed_mentions=None):
         """

@@ -960,6 +960,12 @@ class HTTPClient:
     def interaction_callback(self, id, token, payload):
         return self.request(Route("POST", "/interactions/{id}/{token}/callback", id=id, token=token), json=payload)
 
+    def delete_interaction_callback(self, id, token):
+        return self.request(Route("DELETE", "/interactions/{id}/{token}/messages/@original", id=id, token=id))
+
+    def edit_interaction_callback(self, id, token, payload):
+        return self.request(Route("PATCH", "/interactions/{id}/{token}/messages/@original", id=id, token=id), json=payload)
+
     async def send_followup_message(self, token, payload):
         id = await self.get_application_id()
         return await self.request(Route("POST", "/webhooks/{id}/{token}", id=id, token=token), json=payload)
