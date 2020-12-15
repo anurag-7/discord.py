@@ -44,8 +44,7 @@ from .iterators import AuditLogIterator, MemberIterator
 from .widget import Widget
 from .asset import Asset
 from .flags import SystemChannelFlags
-from .integrations import Integration, ApplicationCommand
-
+from .integrations import Integration
 
 BanEntry = namedtuple('BanEntry', 'reason user')
 _GuildLimit = namedtuple('_GuildLimit', 'emoji bitrate filesize')
@@ -2177,9 +2176,13 @@ class Guild(Hashable):
         await ws.voice_state(self.id, channel_id, self_mute, self_deaf)
 
     async def create_application_command(self, application_command):
+        from .interactions import ApplicationCommand
+        
         data = await self.http.create_application_command(application_command)
         return ApplicationCommand(state=self._state, data=data, guild=self)
 
     async def commands(self):
+        from .interactions import ApplicationCommand
+        
         data = await self.http.get_guild_application_commands(self.id)
         return [ApplicationCommand(state=self._state, data=data, guild=self) for data in data]
