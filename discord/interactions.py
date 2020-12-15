@@ -93,41 +93,6 @@ class Interaction:
         self.version = data['version']
 
     async def send(self, content=None, *, type, tts=False, embed=None, embeds=None, allowed_mentions=None, flags=0):
-        """
-        Sends a message using the webhook.
-        The content must be a type that can convert to a string through ``str(content)``.
-        If the ``embed`` parameter is provided, it must be of type :class:`Embed` and
-        it must be a rich embed type. You cannot mix the ``embed`` parameter with the
-        ``embeds`` parameter, which must be a :class:`list` of :class:`Embed` objects to send.
-        Parameters
-        ------------
-        content: :class:`str`
-            The content of the message to send.
-        tts: :class:`bool`
-                    Indicates if the message should be sent using text-to-speech.
-        embed: :class:`Embed`
-            The rich embed for the content to send. This cannot be mixed with
-            ``embeds`` parameter.
-        embeds: List[:class:`Embed`]
-            A list of embeds to send with the content. Maximum of 10. This cannot
-            be mixed with the ``embed`` parameter.
-        allowed_mentions: :class:`AllowedMentions`
-            Controls the mentions being processed in this message.
-        type: :class:`InteractionResponseType`
-        Raises
-        --------
-        HTTPException
-            Sending the message failed.
-        NotFound
-            This webhook was not found.
-        Forbidden
-            The authorization token for the webhook is incorrect.
-        InvalidArgument
-            You specified both ``embed`` and ``embeds`` or the length of
-            ``embeds`` was invalid or there was no token associated with
-            this webhook.
-        """
-
         payload = {}
         if embeds is not None and embed is not None:
             raise InvalidArgument('Cannot mix embed and embeds keyword arguments.')
@@ -196,41 +161,6 @@ class Interaction:
         await self._state.http.delete_interaction_callback(self.id, self.token)
 
     async def send_followup(self, content=None, *, tts=False, embed=None, embeds=None, allowed_mentions=None):
-        """
-        Sends a message using the webhook.
-        The content must be a type that can convert to a string through ``str(content)``.
-        If the ``embed`` parameter is provided, it must be of type :class:`Embed` and
-        it must be a rich embed type. You cannot mix the ``embed`` parameter with the
-        ``embeds`` parameter, which must be a :class:`list` of :class:`Embed` objects to send.
-        Parameters
-        ------------
-        content: :class:`str`
-            The content of the message to send.
-        tts: :class:`bool`
-                    Indicates if the message should be sent using text-to-speech.
-        embed: :class:`Embed`
-            The rich embed for the content to send. This cannot be mixed with
-            ``embeds`` parameter.
-        embeds: List[:class:`Embed`]
-            A list of embeds to send with the content. Maximum of 10. This cannot
-            be mixed with the ``embed`` parameter.
-        allowed_mentions: :class:`AllowedMentions`
-            Controls the mentions being processed in this message.
-        type: :class:`InteractionResponseType`
-        Raises
-        --------
-        HTTPException
-            Sending the message failed.
-        NotFound
-            This webhook was not found.
-        Forbidden
-            The authorization token for the webhook is incorrect.
-        InvalidArgument
-            You specified both ``embed`` and ``embeds`` or the length of
-            ``embeds`` was invalid or there was no token associated with
-            this webhook.
-        """
-
         payload = {}
         if embeds is not None and embed is not None:
             raise InvalidArgument('Cannot mix embed and embeds keyword arguments.')
