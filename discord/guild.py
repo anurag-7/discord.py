@@ -2178,7 +2178,7 @@ class Guild(Hashable):
     async def create_application_command(self, application_command):
         from .interactions import ApplicationCommand
         
-        data = await self._state.http.create_application_command(application_command)
+        data = await self._state.http.create_guild_application_command(self.id, application_command)
         return ApplicationCommand(state=self._state, data=data, guild=self)
 
     async def fetch_commands(self):
