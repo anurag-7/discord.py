@@ -81,7 +81,6 @@ class ApplicationCommandOption:
 
 class Interaction:
     def __init__(self, *, state, data):
-        print(data)
         self._state = state
         self.id = int(data['id'])
         self.type = try_enum(InteractionType, data['type'])
@@ -90,6 +89,7 @@ class Interaction:
         self.token = data['token']
         self.options = [ApplicationCommandInteractionDataOption(**option) for option in data['data'].get('options', [])]
         self.name = data['data']['name']
+        self.command_id = int(data['data']['id'])
         self.version = data['version']
 
     async def send(self, content=None, *, type, tts=False, embed=None, embeds=None, allowed_mentions=None, flags=0):
