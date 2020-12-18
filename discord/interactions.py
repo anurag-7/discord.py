@@ -46,7 +46,7 @@ class ApplicationCommand:
         else:
             new_data = await self._state.edit_guild_application_command(self.guild.id, self.application_id, kwargs)
 
-        self.__init__(state=self_state, data=new_data, guild=self.guild)
+        self.__init__(state=self._state, data=new_data, guild=self.guild)
 
 class ApplicationCommandOption:
     def __init__(self, *, name, description, type, default=False, required=False, choices=None, options=None):
@@ -67,21 +67,20 @@ class ApplicationCommandOption:
         if choices is None:
             choices = []
 
-        option['choices'] = [ApplicationCommandOptionChoice(**choice) for choice in choices]  
+        option['choices'] = [ApplicationCommandOptionChoice(**choice) for choice in choices]
         option = self.__class__(**option)
         self.options.append(option)
         return option
 
     def to_dict(self):
-        data =  {'name': self.name, 'description': self.description, 'default': self.default, 'required': self.required}
+        data = {'name': self.name, 'description': self.description, 'default': self.default, 'required': self.required}
         data['type'] = self.type.value
         data['options'] = [option.to_dict() for option in self.options]
-        data['choices'] = [choice._as_dict() for choice in self.choices]
+        data['choices'] = [choice._asdict() for choice in self.choices]
         return data
 
 class Interaction:
     def __init__(self, *, state, data):
-        print(data)
         self._state = state
         self.id = int(data['id'])
         self.type = try_enum(InteractionType, data['type'])
@@ -90,6 +89,7 @@ class Interaction:
         self.token = data['token']
         self.options = [ApplicationCommandInteractionDataOption(**option) for option in data['data'].get('options', [])]
         self.name = data['data']['name']
+        self.command_id = int(data['data']['id'])
         self.version = data['version']
 
     async def send(self, content=None, *, type, tts=False, embed=None, embeds=None, allowed_mentions=None, flags=0):
@@ -119,13 +119,13 @@ class Interaction:
                 payload['allowed_mentions'] = allowed_mentions.to_dict()
         elif previous_mentions is not None:
             payload['allowed_mentions'] = previous_mentions.to_dict()
-        
+
         if flags:
             payload['flags'] = flags
 
         await self._state.http.interaction_callback(self.id, self.token, {'data': payload, 'type': type.value})
 
-    async def edit_original(self, **kwargs):
+    async def edit_original(self, **fields):
         try:
             content = fields['content']
         except KeyError:
@@ -155,8 +155,8 @@ class Interaction:
                 fields['allowed_mentions'] = allowed_mentions
 
         if fields:
-            await self._state.http.edit_interaction_message(self.id,self.token, fields)
-    
+            await self._state.http.edit_interaction_message(self.id, self.token, fields)
+
     async def delete_original(self):
         await self._state.http.delete_interaction_callback(self.id, self.token)
 
@@ -187,6 +187,6 @@ class Interaction:
                 payload['allowed_mentions'] = allowed_mentions.to_dict()
         elif previous_mentions is not None:
             payload['allowed_mentions'] = previous_mentions.to_dict()
-        
+
         message = await self._state.http.send_followup_message(self.token, payload)
         return Message(state=self._state, data=message, channel=self.channel)
