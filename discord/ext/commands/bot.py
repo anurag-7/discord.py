@@ -36,7 +36,7 @@ import discord
 
 from .core import GroupMixin
 from .view import StringView
-from .context import Context, IntergrationContext
+from .context import Context, InteractionContext
 from . import errors
 from .help import HelpCommand, DefaultHelpCommand
 from .cog import Cog
@@ -884,8 +884,8 @@ class BotBase(GroupMixin):
         ctx.command = self.all_commands.get(invoker)
         return ctx
 
-    def get_intergration_context(self, intergration, context=IntergrationContext):
-        ctx = context(intergration, self)
+    def get_interaction_context(self, interaction, context=InteractionContext):
+        ctx = context(interaction, self)
         return ctx
 
     async def invoke(self, ctx):
@@ -942,15 +942,15 @@ class BotBase(GroupMixin):
         ctx = await self.get_context(message)
         await self.invoke(ctx)
 
-    async def process_intergration(self, intergration):
-       ctx = self.get_intergration_context(intergration)
+    async def process_interaction(self, interaction):
+       ctx = self.get_interaction_context(interaction)
        await self.invoke(ctx)
 
     async def on_message(self, message):
         await self.process_commands(message)
 
-    async def on_interaction(self, intergration):
-        await self.process_intergration(intergration)
+    async def on_interaction(self, interaction):
+        await self.process_interaction(interaction)
 
 class Bot(BotBase, discord.Client):
     """Represents a discord bot.

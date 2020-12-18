@@ -330,7 +330,7 @@ class Context(discord.abc.Messageable):
     reply.__doc__ = discord.Message.reply.__doc__
 
 
-class IntergrationContext(Context):
+class InteractionContext(Context):
     def __init__(self, application, bot):
         self.application = application 
         self.bot = bot

@@ -1492,10 +1492,10 @@ class Client:
         data = await self.http.get_webhook(webhook_id)
         return Webhook.from_state(data, state=self._connection)
 
-    async def create_intergration_command(self, slash_command):
-        data = await self._connection.http.create_application_command(slash_command)
+    async def create_application_command(self, application_command):
+        data = await self._connection.http.create_application_command(application_command)
         return ApplicationCommand(state=self._connection, data=data)
 
-    async def fetch_commands(self):
+    async def fetch_application_commands(self):
         data = await self._connection.http.get_application_commands()
         return [ApplicationCommand(state=self._connection, data=data) for data in data]

@@ -2175,13 +2175,13 @@ class Guild(Hashable):
         channel_id = channel.id if channel else None
         await ws.voice_state(self.id, channel_id, self_mute, self_deaf)
 
-    async def create_intergration_command(self, application_command):
+    async def create_applicaion_command(self, application_command):
         from .interactions import ApplicationCommand
         
         data = await self._state.http.create_guild_application_command(self.id, application_command)
         return ApplicationCommand(state=self._state, data=data, guild=self)
 
-    async def fetch_commands(self):
+    async def fetch_application_commands(self):
         from .interactions import ApplicationCommand
         
         data = await self._state.http.get_guild_application_commands(self.id)
