@@ -192,3 +192,21 @@ class StringView:
 
     def __repr__(self):
         return '<StringView pos: {0.index} prev: {0.previous} end: {0.end} eof: {0.eof}>'.format(self)
+
+class ApplicationView(StringView):
+    def __init__(self, args):
+        self.buffer = args
+        self.index = 0
+        self.end = len(args)
+        self.previous = 0
+
+    def get_quoted_word(self):
+        return self.buffer[self.index]
+
+    get_word = get_quoted_word
+
+    def read_rest(self):
+        return " ".join(self.buffer[self.index:])
+
+    def skip_ws(self):
+        pass

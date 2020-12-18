@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import discord.abc
 import discord.utils
+from .view import ApplicationView
 
 class Context(discord.abc.Messageable):
     r"""Represents the context in which a command is being invoked under.
@@ -327,3 +328,50 @@ class Context(discord.abc.Messageable):
         return await self.message.reply(content, **kwargs)
 
     reply.__doc__ = discord.Message.reply.__doc__
+
+
+class IntergrationContext(Context):
+    def __init__(self, application, bot):
+        self.application = application 
+        self.bot = bot
+        self.args = [option.name if option.value is None else option.value for option in application.options]  # no i cant use `A or B` here
+        self.kwargs = {}
+        self.prefix = "/"  # haha yes
+        self.view = ApplicationView(self.args)
+        self.invoked_with = application.name
+        self.command = bot.get_command(application.name)
+        self.invoked_subcommand = discord.utils.find(lambda option: option.value is None, application.options)
+        
+        self.id = application.id
+        self.token = application.token
+
+        if self.invoked_subcommand and command:
+            subcommand_passed = self.command.get_command(invoked_subcommand)
+        else:
+            subcommand_passed = None
+
+        self.subcommand_passed = subcommand_passed
+        self.command_failed = None
+        self._state = application._state
+
+    @discord.utils.cached_property
+    def guild(self):
+        """Optional[:class:`.Guild`]: Returns the guild associated with this context's command. None if not available."""
+        return self.application.guild
+
+    @discord.utils.cached_property
+    def channel(self):
+        """:class:`.TextChannel`:
+        Returns the channel associated with this context's command. Shorthand for :attr:`.Message.channel`.
+        """
+        return self.application.channel
+
+    @discord.utils.cached_property
+    def author(self):
+        """Union[:class:`~discord.User`, :class:`.Member`]:
+        Returns the author associated with this context's command. Shorthand for :attr:`.Message.author`
+        """
+        return self.application.author
+
+    send = discord.Interaction.send
+
