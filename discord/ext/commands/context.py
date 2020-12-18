@@ -330,8 +330,8 @@ class Context(discord.abc.Messageable):
     reply.__doc__ = discord.Message.reply.__doc__
 
 
-class ApplicationContext(Context):
-    def __init__(self, application, bot, command):
+class IntergrationContext(Context):
+    def __init__(self, application, bot):
         self.application = application 
         self.bot = bot
         self.args = [option.name if option.value is None else option.value for option in application.options]  # no i cant use `A or B` here
@@ -339,10 +339,13 @@ class ApplicationContext(Context):
         self.prefix = "/"  # haha yes
         self.view = ApplicationView(self.args)
         self.invoked_with = application.name
-        self.command = command
+        self.command = bot.get_command(application.name)
         self.invoked_subcommand = discord.utils.find(lambda option: option.value is None, application.options)
         
-        if self.invoked_subcommand:
+        self.id = application.id
+        self.token = application.token
+
+        if self.invoked_subcommand and command:
             subcommand_passed = self.command.get_command(invoked_subcommand)
         else:
             subcommand_passed = None
@@ -369,3 +372,6 @@ class ApplicationContext(Context):
         Returns the author associated with this context's command. Shorthand for :attr:`.Message.author`
         """
         return self.application.author
+
+    send = discord.Interaction.send
+
