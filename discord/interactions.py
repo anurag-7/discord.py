@@ -85,7 +85,7 @@ class Interaction:
         self.id = int(data['id'])
         self.type = try_enum(InteractionType, data['type'])
         self.channel, self.guild = state._get_guild_channel(data)
-        self.member = Member(data=data['member'], guild=self.guild, state=state)
+        self.author = Member(data=data['member'], guild=self.guild, state=state)
         self.token = data['token']
         self.options = [ApplicationCommandInteractionDataOption(**option) for option in data['data'].get('options', [])]
         self.name = data['data']['name']
