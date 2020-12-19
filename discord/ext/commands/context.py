@@ -332,7 +332,7 @@ class Context(discord.abc.Messageable):
 
 class InteractionContext(Context):
     def __init__(self, application, bot):
-        self.application = application 
+        self.application = application
         self.bot = bot
         self.args = [option.name if option.value is None else option.value for option in application.options]  # no i cant use `A or B` here
         self.kwargs = {}
@@ -341,12 +341,12 @@ class InteractionContext(Context):
         self.invoked_with = application.name
         self.command = bot.get_command(application.name)
         self.invoked_subcommand = discord.utils.find(lambda option: option.value is None, application.options)
-        
+
         self.id = application.id
         self.token = application.token
 
-        if self.invoked_subcommand and command:
-            subcommand_passed = self.command.get_command(invoked_subcommand)
+        if self.invoked_subcommand and self.command:
+            subcommand_passed = self.command.get_command(self.invoked_subcommand)
         else:
             subcommand_passed = None
 
