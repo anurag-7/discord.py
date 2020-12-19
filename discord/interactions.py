@@ -30,11 +30,11 @@ class ApplicationCommand:
 
     async def delete(self):
         if not self.guild:
-            await self._state.delete_application_command(self.application_id, self.id)
+            await self._state.http.delete_application_command(self.application_id, self.id)
         else:
-            self._state.delete_guild_application_command(self.application_id, self.id, self.guild.id)
+            await self._state.http.delete_guild_application_command(self.application_id, self.id, self.guild.id)
 
-    async def edit(self, guild=None, **kwargs):
+    async def edit(self, **kwargs):
         kwargs.setdefault("name", self.name)
         kwargs.setdefault("description", self.description)
         kwargs.setdefault("options", self.options)
@@ -42,9 +42,9 @@ class ApplicationCommand:
         kwargs["options"] = [option.to_dict() for option in kwargs["options"]]
 
         if not self.guild:
-            new_data = await self._state.edit_application_command(self.application_id, kwargs)
+            new_data = await self._state.http.edit_application_command(self.application_id, self.id, kwargs)
         else:
-            new_data = await self._state.edit_guild_application_command(self.guild.id, self.application_id, kwargs)
+            new_data = await self._state.http.edit_guild_application_command(self.application_id, self.id, self.guild.id, kwargs)
 
         self.__init__(state=self._state, data=new_data, guild=self.guild)
 

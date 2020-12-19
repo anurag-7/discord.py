@@ -982,25 +982,22 @@ class HTTPClient:
         id = await self.get_application_id()
         return await self.request(Route("POST", "/applications/{id}/commands", id=id), json=payload)
 
-    async def edit_application_command(self, id, payload):
-        app_id = await self.get_application_id()
+    async def edit_application_command(self, app_id, id, payload):
         return await self.request(Route("PATCH", "/applications/{app_id}/commands/{id}", app_id=app_id, id=id), json=payload)
 
-    async def delete_application_command(self, id):
-        app_id = await self.get_application_id()
+    async def delete_application_command(self, app_id, id):
         return await self.request(Route("DELETE", "/applications/{app_id}/commands/{id}", app_id=app_id, id=id))
 
     async def create_guild_application_command(self, guild_id, payload):
         app_id = await self.get_application_id()
         return await self.request(Route("POST", "/applications/{app_id}/guilds/{guild_id}/commands", app_id=app_id, guild_id=guild_id), json=payload)
 
-    async def edit_guild_application_command(self, guild_id, id, payload):
+    async def edit_guild_application_command(self, app_id, id, guild_id, payload):
         app_id = await self.get_application_id()
         return await self.request(Route("PATCH", "/applications/{app_id}/guilds/{guild_id}/commands/{id}", app_id=app_id, guild_id=guild_id, id=id), json=payload)
 
-    async def delete_guild_application_command(self, guild_id, id, payload):
-        app_id = await self.get_application_id()
-        return await self.request(Route("DELETE", "/applications/{app_id}/guilds/{guild_id}/commands/{id}", app_id=app_id, guild_id=guild_id, id=id), json=payload)
+    async def delete_guild_application_command(self, app_id, id, guild_id):
+        return await self.request(Route("DELETE", "/applications/{app_id}/guilds/{guild_id}/commands/{id}", app_id=app_id, guild_id=guild_id, id=id))
 
     async def get_application_id(self):
         if not self.application_id:
@@ -1008,4 +1005,3 @@ class HTTPClient:
             self.application_id = int(appinfo['id'])
             return self.application_id
         return self.application_id
-
