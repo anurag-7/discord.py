@@ -11,7 +11,7 @@ An extension module to facilitate creation of bot commands.
 """
 
 from .bot import Bot, AutoShardedBot, when_mentioned, when_mentioned_or
-from .context import Context
+from .context import Context, InteractionContext
 from .core import *
 from .errors import *
 from .help import *

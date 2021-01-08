@@ -335,7 +335,8 @@ class InteractionContext(Context):
         self.application = application
         self.bot = bot
         self.args = [option.name if option.value is None else option.value for option in application.options]  # no i cant use `A or B` here
-        self.kwargs = {}
+        self.kwargs = {option.name: option.value for option in application.options}
+        self._kwargs = self.kwargs
         self.prefix = "/"  # haha yes
         self.view = ApplicationView(self.args)
         self.invoked_with = application.name
@@ -374,4 +375,8 @@ class InteractionContext(Context):
         return self.application.author
 
     send = discord.Interaction.send
+    acknowledge = discord.Interaction.acknowledge
+    edit_original = discord.Interaction.edit_original
+    delete_original = discord.Interaction.delete_original
+    send_followup = discord.Interaction.send_followup
 
