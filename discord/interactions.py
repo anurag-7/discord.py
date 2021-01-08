@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from .enums import InteractionResponseType, try_enum, InteractionType, ApplicationCommandOptionType
+from .enums import try_enum, InteractionType, ApplicationCommandOptionType
 from .member import Member
 from .message import Message
 from .errors import InvalidArgument
@@ -92,7 +92,7 @@ class Interaction:
         self.command_id = int(data['data']['id'])
         self.version = data['version']
 
-    async def send(self, content=None, *, type=None, tts=False, embed=None, embeds=None, allowed_mentions=None, flags=0):
+    async def send(self, content=None, *, type, tts=False, embed=None, embeds=None, allowed_mentions=None, flags=0):
         payload = {}
         if embeds is not None and embed is not None:
             raise InvalidArgument('Cannot mix embed and embeds keyword arguments.')
