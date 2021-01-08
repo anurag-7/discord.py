@@ -127,7 +127,7 @@ class Interaction:
 
     async def acknowledge(self, type=None):
         if type is None:
-            await self._state.http.interaction_callback(self.id, self.token, {'type': 5})
+            return await self._state.http.interaction_callback(self.id, self.token, {'type': 5})
         await self._state.http.interaction_callback(self.id, self.token, {'type': type.value})
 
     async def edit_original(self, **fields):
